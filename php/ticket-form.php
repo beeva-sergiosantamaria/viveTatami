@@ -14,7 +14,7 @@ if( isset($name) && isset($email) ) {
 	}
 
 	// Email will be send
-	$to = "mailexample62@gmail.com"; // Change with your email address
+	$to = "sergio.santamaria@beeva.com"; // Change with your email address
 	$sub = "$plan for ENO Conf"; // You can define email subject
 	// HTML Elements for Email Body
 	$body = <<<EOD
