@@ -78,7 +78,7 @@
 [ Using Color Code ]
     h1 [ All ]      Color: #373737                      [ Gray ]
     h2 [ Light ]    Color: #373737                      [ Gray 100% opacity ]
-    h3 [ Light ]    Color: #373737                      [ Gray 100% opacity ]
+    h3 [ Light ]    Color: #ffffff                      [ Gray 100% opacity ]
     p  [ Light ]    Color: rgba(55, 55, 55, 0.7)        [ Gray 70% opacity ]
     a  [ Normal ]   Color: main-color                   [ main-color is changed particular color scheme ]
     a  [ Hover ]    color: as required                  [ as required ]
@@ -204,8 +204,10 @@ h2 {
 }
 h3 {
   font-size: 25px;
-  line-height: 45px;
-  font-weight: 400;
+  line-height: 15px;
+  font-weight: 100;
+	color: aliceblue;
+
 }
 h4 {
   font-size: 22px;
@@ -851,6 +853,10 @@ section.section {
 }
 .features-section-2 .features-item {
   position: relative;
+  z-index: 1;
+}
+.features-section-2 {
+	float: none;
   z-index: 1;
 }
 .features-section-2 .features-item .icon-outer {
