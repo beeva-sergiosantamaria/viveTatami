@@ -254,6 +254,12 @@
                                 <div id="iTween" class="section-block">
                                     <div class="code-block">
                                         <h2>iTween Code Example</h2>
+                                        <p>
+                                            Aunque parezca mentira, dotar a cualquier objeto de animaciones simples (posicion, rotacion, escalado, etc.) es tremendamente engorroso y en todos los casos implica implementar la funcionalidad dentro de la funcion <i>Update()</i> de la clase, que recordemos que es una funcion que se llema en cada frame, lo que supone varios problemas de rendimiento si abusamos de el.
+                                        </p>
+                                        <p>    
+                                            La libreria <a href="http://www.pixelplacement.com/itween/documentation.php" target="_blank">iTween</a> facilita las transiciones entre estados del objeto sin tener que hacer en control a traves del loop de update. Tremendamente util aunque con sus limitaciones, como por ejemplo, que solo puedes manejar los aributos ya contemplados por la libreria, como el color, tamaño, posición o rotacion. para alterar y animar otras porpiedades, como por ejemplo, el emitter, directamente no sirve.<!--<q></q>-->
+                                        </p>
                                         <pre><code class="language-javascript">
                        
                         using UnityEngine;
@@ -288,13 +294,13 @@
                         }
                                         </code></pre>
                                     </div><!--//code-block-->
-                                     <p>
-                                        Aunque parezca mentira, dotar a cualquier objeto de animaciones simples (posicion, rotacion, escalado, etc.) es tremendamente engorroso y en todos los casos implica implementar la funcionalidad dentro de la funcion <i>Update()</i> de la clase, que recordemos que es una funcion que se llema en cada frame, lo que supone varios problemas de rendimiento si abusamos de el. La libreria <a href="http://www.pixelplacement.com/itween/documentation.php" target="_blank">iTween</a> facilita las transiciones entre estados del objeto sin tener que hacer en control a traves del loop de update. Tremendamente util aunque con sus limitaciones, como por ejemplo, que solo puedes manejar los aributos ya contemplados por la libreria, como el color, tamaño, posición o rotacion. para alterar y animar otras porpiedades, como por ejemplo, el emitter, directamente no sirve.<!--<q></q>-->
-                                    </p>
                                 </div><!--//section-block-->
                                 <div id="pointer" class="section-block">
                                     <div class="code-block">
                                         <h2>Control Pointer Code Example</h2>
+                                        <p>
+                                           La manera más habitual actualmente de desplazarse o interactuar con elementos que no estan a nuestro alcance en un entorno VR es uilizar un <i>pointer</i>. Un puntero que sale desde el controller y con el que poder apuntar y activar diferentes acciones. Y aunque parezca mentira, un recurso tan utilizado y tan práctico en este tipo de entornos no cuenta con un <i>prefab</i> en Unity y necesitaremos crear nuestro propio Script. Aunque soluciones hay muchas, aqui reflejamos el codigo para crear uno sencillo y muy configurable basado en <i>Raycast</i> para obtener la información de los objetos a los que apuntes.
+                                        </p>
                                         <pre><code class="language-javascript">
                         using UnityEngine;
                         using System.Collections;
@@ -430,13 +436,13 @@
                         }
                                         </code></pre>
                                     </div><!--//code-block-->
-                                     <p>
-                                        <a href="http://prismjs.com/" target="_blank">Script</a> para generar un pointer que facilite el acceso a objectos que esten a distancia.
-                                    </p>
                                 </div><!--//section-block-->
                                 <div id="inputs" class="section-block">
                                     <div class="code-block">
                                         <h2>Control inputs Code Example</h2>
+                                         <p>
+                                           Cualquier funcionalidad que queramos añadir a los botones de el controller HTC Vive tiene que hacerse via Script. Este codigo devuelve para cada uno de los botones <q><i>true</i></q> o <q><i>false</i></q> segun si esta presionado o no y de esta manera añadirles funcionalidad según su estado</q>.
+                                        </p>
                                         <pre><code class="language-javascript">
 
                         private SteamVR_TrackedObject trackedObject;
@@ -461,8 +467,8 @@
                             }
                                         </code></pre>
                                     </div><!--//code-block-->
-                                     <p>
-                                        <a href="http://prismjs.com/" target="_blank">Código</a> Cualquier funcionalidad que queramos añadir a los botones de el controller HTC Vive tiene que hacerse via Script. Este codigo devuelve para cada uno de los botones <q><i>true</i></q> o <q><i>false</i></q> segun si esta presionado o no y de esta manera añadirles funcionalidad según su estado. Hay que tener en cuenta que estos scripts solo tienen acceso al estado de los botones si estan inyectados en el propio objeto, no se puede acceder a ellos desde cualquier otro objeto (<q><i>ver imagen</i></q>).
+                                    <p>
+                                        Hay que tener en cuenta que estos scripts solo tienen acceso al estado de los botones si estan inyectados en el propio objeto, no se puede acceder a ellos desde cualquier otro objeto (<q><i>ver imagen</i>).
                                     </p>
                                      <div class="row">
                                         <div class="col-md-6 col-sm-6 col-xs-12">
@@ -481,7 +487,63 @@
                                         </code></pre>
                                     </div><!--//code-block-->
                                      <p>
-                                        <a href="http://prismjs.com/" target="_blank">Código</a> Según como este estructurada nuestra app, a menudo es necesario obtener via script la capa en la que hemos ubicado un elemento para decidir si se ve afectado por una acción o no y en la documentacion de Unity no hay especidficaciones para acceder a ella. esta simple linea inyectada en el propio objeto nos devuelve el numero y nombre de la capa en la que se encuentra.
+                                       Según como este estructurada nuestra app, a menudo es necesario obtener via script la capa en la que hemos ubicado un elemento para decidir si se ve afectado por una acción o no y en la documentacion de Unity no hay especidficaciones para acceder a ella. esta simple linea inyectada en el propio objeto nos devuelve el numero y nombre de la capa en la que se encuentra.
+                                    </p>
+                                </div><!--//section-block-->
+                                <div id="layers" class="section-block">
+                                    <div class="code-block">
+                                        <h2>API rest</h2>
+                                        <pre><code class="language-javascript">
+                            public GameObject rainSystem;
+                            public GameObject CloudSystem;
+                            private Text txt;
+                            
+                            IEnumerator AdjustSkyToWeather() {
+                                while (true) {
+
+                                    string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                                    
+                                    WWW weatherWWW = new WWW (weatherUrl);
+
+                                    yield return weatherWWW;
+                                    
+                                    JSONObject tempData = new JSONObject (weatherWWW.text);
+                                    
+                                    yield return new WaitForSeconds(60);
+                                }
+                            }
+                            
+                            void Start () {
+                                StartCoroutine (AdjustSkyToWeather());
+                            }
+                                        </code></pre>
+                                    </div><!--//code-block-->
+                                     <p>
+                                       Consumir API de terceros que nos aporten información contextual para, por ejemplo, un widget del tiempo, no esta contemplado por Unity, por lo que se hace necesario instalar un plugin adicional. En nustro caso optamos por WWW, de cuyo uso dejamos constancia con este Script.
+                                    </p>
+                                     <p>
+                                       Con este Script llamamos al coroutine cada 60 segundos para actualizar la informacion del tiempo a traves de la API de <i>openWeatherMap</i>.
+                                    </p>
+                                </div><!--//section-block-->
+                                 <div id="layers" class="section-block">
+                                    <div class="code-block">
+                                        <h2>JSON parsing</h2>
+                                        <pre><code class="language-javascript">
+                            
+                            void Start () {
+                                string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                                    
+                                    WWW weatherWWW = new WWW (weatherUrl);
+
+                                    yield return weatherWWW;
+                                    
+                                    JSONObject tempData = new JSONObject (weatherWWW.text);
+                                    
+                            }
+                                        </code></pre>
+                                    </div><!--//code-block-->
+                                     <p>
+                                       Unity tampoco esta preparado para trabajar con datos en formato JSON, que tan comunes son en el uso de API, por eso es necesario instalar un plugin que convierta los datos en este formato en uno que Unity entienda. Hay muchas librerias con las que poder convertirlo, en este caso usamos JSONObject y dejamos un ejemplo de como transformar los datos recibidos.
                                     </p>
                                 </div><!--//section-block-->
                             </section><!--//doc-section-->
