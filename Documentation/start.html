@@ -490,7 +490,7 @@
                                        Según como este estructurada nuestra app, a menudo es necesario obtener via script la capa en la que hemos ubicado un elemento para decidir si se ve afectado por una acción o no y en la documentacion de Unity no hay especidficaciones para acceder a ella. esta simple linea inyectada en el propio objeto nos devuelve el numero y nombre de la capa en la que se encuentra.
                                     </p>
                                 </div><!--//section-block-->
-                                <div id="layers" class="section-block">
+                                <div id="api" class="section-block">
                                     <div class="code-block">
                                         <h2>API rest</h2>
                                         <pre><code class="language-javascript">
@@ -525,7 +525,7 @@
                                        Con este Script llamamos al coroutine cada 60 segundos para actualizar la informacion del tiempo a traves de la API de <i>openWeatherMap</i>.
                                     </p>
                                 </div><!--//section-block-->
-                                 <div id="layers" class="section-block">
+                                 <div id="json" class="section-block">
                                     <div class="code-block">
                                         <h2>JSON parsing</h2>
                                         <pre><code class="language-javascript">
@@ -544,6 +544,101 @@
                                     </div><!--//code-block-->
                                      <p>
                                        Unity tampoco esta preparado para trabajar con datos en formato JSON, que tan comunes son en el uso de API, por eso es necesario instalar un plugin que convierta los datos en este formato en uno que Unity entienda. Hay muchas librerias con las que poder convertirlo, en este caso usamos JSONObject y dejamos un ejemplo de como transformar los datos recibidos.
+                                    </p>
+                                </div><!--//section-block-->
+                                 <div id="rotate" class="section-block">
+                                    <div class="code-block">
+                                        <h2>Rotate around</h2>
+                                        <pre><code class="language-javascript">
+                            
+                             public GameObject CenterToOrbital;
+                             public Transform center;
+                             public Vector3 axis = Vector3.up;
+                             public float radius = 0.4f;
+                             public float radiusSpeed = 0.4f;
+                             public float rotationSpeed = 2.0f;
+                         
+                             void Start () {
+                                radius = 0.4f;
+                                radiusSpeed = 0.4f;
+                                rotationSpeed = 2.0f;
+                                center = CenterToOrbital.transform;
+                                transform.position = (transform.position - center.position).normalized * radius + center.position;
+                             }
+                             
+                             void Update () {
+                                 transform.RotateAround (center.position, axis, rotationSpeed * Time.deltaTime);
+                                 desiredposition = (transform.position - center.position).normalized * radius + center.position;
+                                 transform.position = Vector3.MoveTowards(transform.position, desiredposition, Time.deltaTime * radiusSpeed);
+                             }
+                                        </code></pre>
+                                    </div><!--//code-block-->
+                                     <p>
+                                       Un ejemplo de animacion simple que no esta contemplada en la libreria ITween es una simple funcion para que un objeto rote al rededor de otro.
+                                    </p>
+                                    <p>
+                                       En este caso si es necesario recurrir al loop de update para animar la funcion, y dividir la posicion en lugar de frame a frame utilizando unidades de tiempo ( <i>Time.deltaTime</i> ) para reducir la frecuencia con la que es llamada.
+                                    </p>
+                                </div><!--//section-block-->
+                                  <div id="speech" class="section-block">
+                                    <div class="code-block">
+                                        <h2>speechRecognition</h2>
+                                        <pre><code class="language-javascript">
+                            using UnityEngine;
+                            using System.Collections;
+                            using UnityEngine.Windows.Speech;
+                            using System.Collections.Generic;
+                            using System.Linq;
+
+                            public class speechRecognition : MonoBehaviour {
+
+                                //private Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
+                                private string[] keywords = new string[] { "hola", "abrir", "cerrar", "atras" };
+                                public ConfidenceLevel confidence = ConfidenceLevel.Medium;
+                                protected string word = "cerrar App";
+                                private KeywordRecognizer recognizer;
+                                public static string phraseToBox = "";
+                                void Start () {
+                                     if (keywords != null)
+                                    {
+                                        recognizer = new KeywordRecognizer(keywords, confidence);
+                                        recognizer.OnPhraseRecognized += Recognizer_OnPhraseRecognized;
+                                        recognizer.Start();
+                                    }
+                                }
+
+                                public void Recognizer_OnPhraseRecognized( PhraseRecognizedEventArgs args ){
+
+                                    System.Action keywordAction;
+
+                                    Debug.Log(args.text);
+
+                                    if( mainControllerScript.mainMenuPosition == 1 ) phraseToBox = args.text;
+
+                                    if( keywords.TryGetValue(args.text, out keywordAction) ){
+                                        keywordAction.Invoke();
+                                    }
+                                }
+
+                                void OnApplicationQuit()
+                                {
+                                    if (recognizer != null && recognizer.IsRunning)
+                                    {
+                                        recognizer.OnPhraseRecognized -= Recognizer_OnPhraseRecognized;
+                                        recognizer.Stop();
+                                    }
+                                }
+                            }
+                                        </code></pre>
+                                    </div><!--//code-block-->
+                                     <p>
+                                       Unity cuenta con una libreria nativa para tareas de speech to text. en este codigo ejemplo mostramos como poder utilizarla para realizar por ejemplo comandos de voz. 
+                                    </p>
+                                    <p>
+                                       <i>KeywordRecognizer</i> ofrece la posibilidad de buscar match de lo que recoge el microfono y un listado de terminos que le pasemos para poder realizar tareas concretas segun que palabra reconozca.
+                                    </p>
+                                    <p>
+                                       <i>OnPhraseRecognized</i> permite recoger oraciones enteras, que despues podemos pasar a un sistema de NLP para realizar interacciones conversacionales con nuestra App. <b>(actualmente despues de las últimas actualizaciones en Windows 10 <i>OnPhraseRecognized</i> no es compatible y ha quedado fuera de uso)</b>.
                                     </p>
                                 </div><!--//section-block-->
                             </section><!--//doc-section-->
@@ -569,6 +664,10 @@
                                         <li><a class="scrollto" href="#pointer">Control Pointer</a></li>
                                         <li><a class="scrollto" href="#inputs">Control Inputs</a></li>
                                         <li><a class="scrollto" href="#layers">Layer filter</a></li>
+                                        <li><a class="scrollto" href="#api">API Rest</a></li>
+                                        <li><a class="scrollto" href="#json">JSON Parsing</a></li>
+                                        <li><a class="scrollto" href="#rotate">Rotate Around</a></li>
+                                        <li><a class="scrollto" href="#speech">speechRecognition</a></li>
                                     </ul>
                                 </li>
                                 <!--<li><a class="scrollto" href="#callouts-section">Callouts</a></li>
