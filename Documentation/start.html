@@ -499,7 +499,7 @@
             IEnumerator AdjustSkyToWeather() {
                 while (true) {
 
-                    string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                    string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=";
                     
                     WWW weatherWWW = new WWW (weatherUrl);
 
@@ -529,13 +529,13 @@
                                         <pre><code class="language-javascript">
                             
             void Start () {
-                string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=";
                     
-                    WWW weatherWWW = new WWW (weatherUrl);
+                WWW weatherWWW = new WWW (weatherUrl);
 
-                    yield return weatherWWW;
-                    
-                    JSONObject tempData = new JSONObject (weatherWWW.text);
+                yield return weatherWWW;
+                
+                JSONObject tempData = new JSONObject (weatherWWW.text);
                     
             }
                                         </code></pre>
