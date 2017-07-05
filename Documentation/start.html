@@ -258,40 +258,39 @@
                                             Aunque parezca mentira, dotar a cualquier objeto de animaciones simples (posicion, rotacion, escalado, etc.) es tremendamente engorroso y en todos los casos implica implementar la funcionalidad dentro de la funcion <i>Update()</i> de la clase, que recordemos que es una funcion que se llema en cada frame, lo que supone varios problemas de rendimiento si abusamos de el.
                                         </p>
                                         <p>    
-                                            La libreria <a href="http://www.pixelplacement.com/itween/documentation.php" target="_blank">iTween</a> facilita las transiciones entre estados del objeto sin tener que hacer en control a traves del loop de update. Tremendamente util aunque con sus limitaciones, como por ejemplo, que solo puedes manejar los aributos ya contemplados por la libreria, como el color, tamaño, posición o rotacion. para alterar y animar otras porpiedades, como por ejemplo, el emitter, directamente no sirve.<!--<q></q>-->
+                                            La libreria <a href="http://www.pixelplacement.com/itween/documentation.php" target="_blank">iTween</a> facilita las transiciones entre estados del objeto sin tener que hacer el control a traves del loop de update. Tremendamente util aunque con sus limitaciones, como por ejemplo, que solo puedes manejar los aributos ya contemplados por la libreria, como el color, tamaño, posición o rotacion. Para alterar y animar otras porpiedades, como por ejemplo, el emitter, directamente no sirve.<!--<q></q>-->
                                         </p>
                                         <pre><code class="language-javascript">
-                       
-                        using UnityEngine;
-                        using System.Collections;
+        using UnityEngine;
+        using System.Collections;
 
-                        public class moveObject : MonoBehaviour {
+        public class moveObject : MonoBehaviour {
 
-                            public GameObject ObjectToMove;
-                            public Vector3 PositionBefore;
-                            public float timeInit;
-                            public float TimeDuration;
-                            public iTween.EaseType easeType;
-                            void Start () {
-                                StartCoroutine(changePositionr(PositionBefore));
-                            }
-                            void Update () {
-                            
-                            }
-                            IEnumerator changePositionr(Vector3 pos){
+            public GameObject ObjectToMove;
+            public Vector3 PositionBefore;
+            public float timeInit;
+            public float TimeDuration;
+            public iTween.EaseType easeType;
+            void Start () {
+                StartCoroutine(changePositionr(PositionBefore));
+            }
+            void Update () {
+            
+            }
+            IEnumerator changePositionr(Vector3 pos){
 
-                                yield return new WaitForSeconds(timeInit);
-                                iTween.MoveTo( ObjectToMove, iTween.Hash(
-                                        "x"    , pos.x,
-                                        "y"    , pos.y,
-                                        "z"    , pos.z,
-                                        "easeType", easeType,
-                                        "time" , TimeDuration,
-                                        "delay" , 0.5f
-                                    ));
-                                yield break;
-                            }
-                        }
+                yield return new WaitForSeconds(timeInit);
+                iTween.MoveTo( ObjectToMove, iTween.Hash(
+                        "x"    , pos.x,
+                        "y"    , pos.y,
+                        "z"    , pos.z,
+                        "easeType", easeType,
+                        "time" , TimeDuration,
+                        "delay" , 0.5f
+                    ));
+                yield break;
+            }
+        }
                                         </code></pre>
                                     </div><!--//code-block-->
                                 </div><!--//section-block-->
@@ -299,141 +298,141 @@
                                     <div class="code-block">
                                         <h2>Control Pointer Code Example</h2>
                                         <p>
-                                           La manera más habitual actualmente de desplazarse o interactuar con elementos que no estan a nuestro alcance en un entorno VR es uilizar un <i>pointer</i>. Un puntero que sale desde el controller y con el que poder apuntar y activar diferentes acciones. Y aunque parezca mentira, un recurso tan utilizado y tan práctico en este tipo de entornos no cuenta con un <i>prefab</i> en Unity y necesitaremos crear nuestro propio Script. Aunque soluciones hay muchas, aqui reflejamos el codigo para crear uno sencillo y muy configurable basado en <i>Raycast</i> para obtener la información de los objetos a los que apuntes.
+                                           La manera más habitual actualmente de desplazarse o interactuar con elementos que no estan a nuestro alcance en un entorno VR es uilizar un <i>pointer</i>. Un puntero que sale desde el controller y con el que poder apuntar y activar diferentes acciones. Y aunque parezca mentira, un recurso tan utilizado y tan práctico en este tipo de entornos no cuenta con un <i>prefab</i> en Unity y necesitaremos crear nuestro propio Script. Aunque soluciones hay muchas, aqui reflejamos el codigo para crear uno sencillo y muy configurable, basado en <i>Raycast</i>, para obtener la información de los objetos a los que apuntes.
                                         </p>
                                         <pre><code class="language-javascript">
-                        using UnityEngine;
-                        using System.Collections;
+        using UnityEngine;
+        using System.Collections;
 
-                        public class controlPointer : MonoBehaviour {
+        public class controlPointer : MonoBehaviour {
 
-                             public enum AxisType
-                            {
-                                XAxis,
-                                ZAxis
-                            }
+             public enum AxisType
+            {
+                XAxis,
+                ZAxis
+            }
 
-                            public Color color;
-                            public float thickness = 0.002f;    
-                            public AxisType facingAxis = AxisType.XAxis;
-                            public float length = 100f;
-                            public bool showCursor = true;
-                            public static string objectContacted = "undefined";
+            public Color color;
+            public float thickness = 0.002f;    
+            public AxisType facingAxis = AxisType.XAxis;
+            public float length = 100f;
+            public bool showCursor = true;
+            public static string objectContacted = "undefined";
 
-                            GameObject holder;
-                            GameObject pointer;
-                            GameObject cursor;
+            GameObject holder;
+            GameObject pointer;
+            GameObject cursor;
 
-                            Vector3 cursorScale = new Vector3(0.05f, 0.05f, 0.05f);
-                            float contactDistance = 0f;
-                            Transform contactTarget = null;
+            Vector3 cursorScale = new Vector3(0.05f, 0.05f, 0.05f);
+            float contactDistance = 0f;
+            Transform contactTarget = null;
 
-                            void SetPointerTransform(float setLength, float setThicknes)
-                            {
-                                //if the additional decimal isn't added then the beam position glitches
-                                float beamPosition = setLength / (2 + 0.00001f);
+            void SetPointerTransform(float setLength, float setThicknes)
+            {
+                //if the additional decimal isn't added then the beam position glitches
+                float beamPosition = setLength / (2 + 0.00001f);
 
-                                if (facingAxis == AxisType.XAxis)
-                                {
-                                    pointer.transform.localScale = new Vector3(setLength, setThicknes, setThicknes);
-                                    pointer.transform.localPosition = new Vector3(beamPosition, 0f, 0f);
-                                    if (showCursor)
-                                    {
-                                        cursor.transform.localPosition = new Vector3(setLength - cursor.transform.localScale.x, 0f, 0f);
-                                    }
-                                } else
-                                {
-                                    pointer.transform.localScale = new Vector3(setThicknes, setThicknes, setLength);
-                                    pointer.transform.localPosition = new Vector3(0f, 0f, beamPosition);
+                if (facingAxis == AxisType.XAxis)
+                {
+                    pointer.transform.localScale = new Vector3(setLength, setThicknes, setThicknes);
+                    pointer.transform.localPosition = new Vector3(beamPosition, 0f, 0f);
+                    if (showCursor)
+                    {
+                        cursor.transform.localPosition = new Vector3(setLength - cursor.transform.localScale.x, 0f, 0f);
+                    }
+                } else
+                {
+                    pointer.transform.localScale = new Vector3(setThicknes, setThicknes, setLength);
+                    pointer.transform.localPosition = new Vector3(0f, 0f, beamPosition);
 
-                                    if (showCursor)
-                                    {
-                                        cursor.transform.localPosition = new Vector3(0f, 0f, setLength - cursor.transform.localScale.z);
-                                    }
-                                }
-                            }
+                    if (showCursor)
+                    {
+                        cursor.transform.localPosition = new Vector3(0f, 0f, setLength - cursor.transform.localScale.z);
+                    }
+                }
+            }
 
-                            // Use this for initialization
-                            void Start () {
-                                Material newMaterial = new Material(Shader.Find("Unlit/Color"));
-                                newMaterial.SetColor("_Color", color);
-                                
-                                holder = new GameObject();
-                                holder.transform.parent = this.transform;
-                                holder.transform.localPosition = Vector3.zero;
+            // Use this for initialization
+            void Start () {
+                Material newMaterial = new Material(Shader.Find("Unlit/Color"));
+                newMaterial.SetColor("_Color", color);
+                
+                holder = new GameObject();
+                holder.transform.parent = this.transform;
+                holder.transform.localPosition = Vector3.zero;
 
-                                pointer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                                pointer.transform.parent = holder.transform;
-                                pointer.GetComponent<MeshRenderer>().material = newMaterial;
+                pointer = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                pointer.transform.parent = holder.transform;
+                pointer.GetComponent<MeshRenderer>().material = newMaterial;
 
-                                pointer.GetComponent<BoxCollider>().isTrigger = true;
-                                pointer.AddComponent<Rigidbody>().isKinematic = true;
-                                pointer.layer = 2;
+                pointer.GetComponent<BoxCollider>().isTrigger = true;
+                pointer.AddComponent<Rigidbody>().isKinematic = true;
+                pointer.layer = 2;
 
-                                if (showCursor)
-                                {
-                                    cursor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                                    cursor.name = "pointActive";
-                                    cursor.transform.parent = holder.transform;
-                                    cursor.GetComponent<MeshRenderer>().material = newMaterial;
-                                    cursor.transform.localScale = cursorScale;
+                if (showCursor)
+                {
+                    cursor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    cursor.name = "pointActive";
+                    cursor.transform.parent = holder.transform;
+                    cursor.GetComponent<MeshRenderer>().material = newMaterial;
+                    cursor.transform.localScale = cursorScale;
 
-                                    cursor.GetComponent<SphereCollider>().isTrigger = true;
-                                    cursor.AddComponent<Rigidbody>().isKinematic = true;
-                                    cursor.layer = 2;
-                                }
+                    cursor.GetComponent<SphereCollider>().isTrigger = true;
+                    cursor.AddComponent<Rigidbody>().isKinematic = true;
+                    cursor.layer = 2;
+                }
 
-                                SetPointerTransform(length, thickness);        
-                            }
+                SetPointerTransform(length, thickness);        
+            }
 
-                            float GetBeamLength(bool bHit, RaycastHit hit)
-                            {
-                                float actualLength = length;
+            float GetBeamLength(bool bHit, RaycastHit hit)
+            {
+                float actualLength = length;
 
-                                //reset if beam not hitting or hitting new target
-                                if (!bHit || (contactTarget && contactTarget != hit.transform))
-                                {
-                                    contactDistance = 0f;
-                                    contactTarget = null;
-                                }
+                //reset if beam not hitting or hitting new target
+                if (!bHit || (contactTarget && contactTarget != hit.transform))
+                {
+                    contactDistance = 0f;
+                    contactTarget = null;
+                }
 
-                                //check if beam has hit a new target
-                                if (bHit)
-                                {
-                                    if (hit.distance <= 0)
-                                    {
+                //check if beam has hit a new target
+                if (bHit)
+                {
+                    if (hit.distance <= 0)
+                    {
 
-                                    }
-                                    contactDistance = hit.distance;
-                                    contactTarget = hit.transform;
-                                    if( hit.transform.gameObject.layer == 10 || hit.transform.gameObject.layer == 11 ) { objectContacted = hit.transform.name; }
-                                    else objectContacted = "undefined";
-                                }
+                    }
+                    contactDistance = hit.distance;
+                    contactTarget = hit.transform;
+                    if( hit.transform.gameObject.layer == 10 || hit.transform.gameObject.layer == 11 ) { objectContacted = hit.transform.name; }
+                    else objectContacted = "undefined";
+                }
 
-                                //adjust beam length if something is blocking it
-                                if (bHit && contactDistance < length)
-                                {
-                                    actualLength = contactDistance;
-                                }
+                //adjust beam length if something is blocking it
+                if (bHit && contactDistance < length)
+                {
+                    actualLength = contactDistance;
+                }
 
-                                if (actualLength <= 0)
-                                {
-                                    actualLength = length;
-                                }
+                if (actualLength <= 0)
+                {
+                    actualLength = length;
+                }
 
-                                return actualLength; ;
-                            }
-                            
-                            void Update () {
-                                Ray raycast = new Ray(transform.position, transform.forward);
-                                
-                                RaycastHit hitObject;
-                                bool rayHit = Physics.Raycast(raycast, out hitObject);
+                return actualLength; ;
+            }
+            
+            void Update () {
+                Ray raycast = new Ray(transform.position, transform.forward);
+                
+                RaycastHit hitObject;
+                bool rayHit = Physics.Raycast(raycast, out hitObject);
 
-                                float beamLength = GetBeamLength(rayHit, hitObject);
-                                SetPointerTransform(beamLength, thickness);
-                            }
-                        }
+                float beamLength = GetBeamLength(rayHit, hitObject);
+                SetPointerTransform(beamLength, thickness);
+            }
+        }
                                         </code></pre>
                                     </div><!--//code-block-->
                                 </div><!--//section-block-->
@@ -444,27 +443,26 @@
                                            Cualquier funcionalidad que queramos añadir a los botones de el controller HTC Vive tiene que hacerse via Script. Este codigo devuelve para cada uno de los botones <q><i>true</i></q> o <q><i>false</i></q> segun si esta presionado o no y de esta manera añadirles funcionalidad según su estado</q>.
                                         </p>
                                         <pre><code class="language-javascript">
+        private SteamVR_TrackedObject trackedObject;
+        private SteamVR_Controller.Device device;
 
-                        private SteamVR_TrackedObject trackedObject;
-                        private SteamVR_Controller.Device device;
+        void Start () {
+                trackedObject = GetComponent<SteamVR_TrackedObject>();
+            }
 
-                        void Start () {
-                                trackedObject = GetComponent<SteamVR_TrackedObject>();
-                            }
+        void Update () {
 
-                        void Update () {
+                device = SteamVR_Controller.Input((int)trackedObject.index);
 
-                                device = SteamVR_Controller.Input((int)trackedObject.index);
+                device.GetTouchDown(SteamVR_Controller.ButtonMask.Grip); 
 
-                                device.GetTouchDown(SteamVR_Controller.ButtonMask.Grip); 
+                device.GetPress(SteamVR_Controller.ButtonMask.Trigger);
 
-                                device.GetPress(SteamVR_Controller.ButtonMask.Trigger);
+                device.GetPress(SteamVR_Controller.ButtonMask.ApplicationMenu);
 
-                                device.GetPress(SteamVR_Controller.ButtonMask.ApplicationMenu);
+                device.GetPress(SteamVR_Controller.ButtonMask.TouchPad);
 
-                                device.GetPress(SteamVR_Controller.ButtonMask.TouchPad);
-
-                            }
+            }
                                         </code></pre>
                                     </div><!--//code-block-->
                                     <p>
@@ -494,35 +492,35 @@
                                     <div class="code-block">
                                         <h2>API rest</h2>
                                         <pre><code class="language-javascript">
-                            public GameObject rainSystem;
-                            public GameObject CloudSystem;
-                            private Text txt;
-                            
-                            IEnumerator AdjustSkyToWeather() {
-                                while (true) {
+            public GameObject rainSystem;
+            public GameObject CloudSystem;
+            private Text txt;
+            
+            IEnumerator AdjustSkyToWeather() {
+                while (true) {
 
-                                    string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
-                                    
-                                    WWW weatherWWW = new WWW (weatherUrl);
+                    string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                    
+                    WWW weatherWWW = new WWW (weatherUrl);
 
-                                    yield return weatherWWW;
-                                    
-                                    JSONObject tempData = new JSONObject (weatherWWW.text);
-                                    
-                                    yield return new WaitForSeconds(60);
-                                }
-                            }
-                            
-                            void Start () {
-                                StartCoroutine (AdjustSkyToWeather());
-                            }
+                    yield return weatherWWW;
+                    
+                    JSONObject tempData = new JSONObject (weatherWWW.text);
+                    
+                    yield return new WaitForSeconds(60);
+                }
+            }
+            
+            void Start () {
+                StartCoroutine (AdjustSkyToWeather());
+            }
                                         </code></pre>
                                     </div><!--//code-block-->
                                      <p>
                                        Consumir API de terceros que nos aporten información contextual para, por ejemplo, un widget del tiempo, no esta contemplado por Unity, por lo que se hace necesario instalar un plugin adicional. En nustro caso optamos por WWW, de cuyo uso dejamos constancia con este Script.
                                     </p>
                                      <p>
-                                       Con este Script llamamos al coroutine cada 60 segundos para actualizar la informacion del tiempo a traves de la API de <i>openWeatherMap</i>.
+                                       Con este Script llamamos al coroutine cada 60 segundos para actualizar la informacion del tiempo a traves de la API de <i>openWeatherMap</i>.(A dia de hoy, este plugin ya forma parte de las librerias standar de Unity).
                                     </p>
                                 </div><!--//section-block-->
                                  <div id="json" class="section-block">
@@ -530,105 +528,107 @@
                                         <h2>JSON parsing</h2>
                                         <pre><code class="language-javascript">
                             
-                            void Start () {
-                                string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
-                                    
-                                    WWW weatherWWW = new WWW (weatherUrl);
+            void Start () {
+                string weatherUrl = "http://api.openweathermap.org/data/2.5/weather?q=Madrid,ES&units=metric&appid=ab68bc64552d2af53af0f6b928972688";
+                    
+                    WWW weatherWWW = new WWW (weatherUrl);
 
-                                    yield return weatherWWW;
-                                    
-                                    JSONObject tempData = new JSONObject (weatherWWW.text);
-                                    
-                            }
+                    yield return weatherWWW;
+                    
+                    JSONObject tempData = new JSONObject (weatherWWW.text);
+                    
+            }
                                         </code></pre>
                                     </div><!--//code-block-->
                                      <p>
                                        Unity tampoco esta preparado para trabajar con datos en formato JSON, que tan comunes son en el uso de API, por eso es necesario instalar un plugin que convierta los datos en este formato en uno que Unity entienda. Hay muchas librerias con las que poder convertirlo, en este caso usamos JSONObject y dejamos un ejemplo de como transformar los datos recibidos.
                                     </p>
+                                    <p>
+                                       Aprovecho para comentar que <i>yield return</i> funciona en c# igual que un <i>callback</i> o un <i>promise</i> en javascript, detiene la cola de procesos hasta que recibe <i>weatherWWW</i>. Asi evitamos que haga el JSON parsing antes de que hayan podido llegar los datos desde la API.
+                                    </p>
                                 </div><!--//section-block-->
                                  <div id="rotate" class="section-block">
                                     <div class="code-block">
                                         <h2>Rotate around</h2>
-                                        <pre><code class="language-javascript">
-                            
-                             public GameObject CenterToOrbital;
-                             public Transform center;
-                             public Vector3 axis = Vector3.up;
-                             public float radius = 0.4f;
-                             public float radiusSpeed = 0.4f;
-                             public float rotationSpeed = 2.0f;
-                         
-                             void Start () {
-                                radius = 0.4f;
-                                radiusSpeed = 0.4f;
-                                rotationSpeed = 2.0f;
-                                center = CenterToOrbital.transform;
-                                transform.position = (transform.position - center.position).normalized * radius + center.position;
-                             }
-                             
-                             void Update () {
-                                 transform.RotateAround (center.position, axis, rotationSpeed * Time.deltaTime);
-                                 desiredposition = (transform.position - center.position).normalized * radius + center.position;
-                                 transform.position = Vector3.MoveTowards(transform.position, desiredposition, Time.deltaTime * radiusSpeed);
-                             }
+                                        <pre><code class="language-javascript">     
+             public GameObject CenterToOrbital;
+             public Transform center;
+             public Vector3 axis = Vector3.up;
+             public float radius = 0.4f;
+             public float radiusSpeed = 0.4f;
+             public float rotationSpeed = 2.0f;
+         
+             void Start () {
+                radius = 0.4f;
+                radiusSpeed = 0.4f;
+                rotationSpeed = 2.0f;
+                center = CenterToOrbital.transform;
+                transform.position = (transform.position - center.position).normalized * radius + center.position;
+             }
+             
+             void Update () {
+                 transform.RotateAround (center.position, axis, rotationSpeed * Time.deltaTime);
+                 desiredposition = (transform.position - center.position).normalized * radius + center.position;
+                 transform.position = Vector3.MoveTowards(transform.position, desiredposition, Time.deltaTime * radiusSpeed);
+             }
                                         </code></pre>
                                     </div><!--//code-block-->
                                      <p>
                                        Un ejemplo de animacion simple que no esta contemplada en la libreria ITween es una simple funcion para que un objeto rote al rededor de otro.
                                     </p>
                                     <p>
-                                       En este caso si es necesario recurrir al loop de update para animar la funcion, y dividir la posicion en lugar de frame a frame utilizando unidades de tiempo ( <i>Time.deltaTime</i> ) para reducir la frecuencia con la que es llamada.
+                                       En este caso si es necesario recurrir al loop de update para animar la funcion, y dividir la posicion en lugar de frame a frame (que es la frecuencia a la que funciona el loop de <i>Update()</i>) utilizando unidades de tiempo ( <i>Time.deltaTime</i> ) para reducir la frecuencia con la que es llamada y mejorar un poco el rendimiento.
                                     </p>
                                 </div><!--//section-block-->
                                   <div id="speech" class="section-block">
                                     <div class="code-block">
                                         <h2>speechRecognition</h2>
                                         <pre><code class="language-javascript">
-                            using UnityEngine;
-                            using System.Collections;
-                            using UnityEngine.Windows.Speech;
-                            using System.Collections.Generic;
-                            using System.Linq;
+            using UnityEngine;
+            using System.Collections;
+            using UnityEngine.Windows.Speech;
+            using System.Collections.Generic;
+            using System.Linq;
 
-                            public class speechRecognition : MonoBehaviour {
+            public class speechRecognition : MonoBehaviour {
 
-                                //private Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
-                                private string[] keywords = new string[] { "hola", "abrir", "cerrar", "atras" };
-                                public ConfidenceLevel confidence = ConfidenceLevel.Medium;
-                                protected string word = "cerrar App";
-                                private KeywordRecognizer recognizer;
-                                public static string phraseToBox = "";
-                                void Start () {
-                                     if (keywords != null)
-                                    {
-                                        recognizer = new KeywordRecognizer(keywords, confidence);
-                                        recognizer.OnPhraseRecognized += Recognizer_OnPhraseRecognized;
-                                        recognizer.Start();
-                                    }
-                                }
+                //private Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
+                private string[] keywords = new string[] { "hola", "abrir", "cerrar", "atras" };
+                public ConfidenceLevel confidence = ConfidenceLevel.Medium;
+                protected string word = "cerrar App";
+                private KeywordRecognizer recognizer;
+                public static string phraseToBox = "";
+                void Start () {
+                     if (keywords != null)
+                    {
+                        recognizer = new KeywordRecognizer(keywords, confidence);
+                        recognizer.OnPhraseRecognized += Recognizer_OnPhraseRecognized;
+                        recognizer.Start();
+                    }
+                }
 
-                                public void Recognizer_OnPhraseRecognized( PhraseRecognizedEventArgs args ){
+                public void Recognizer_OnPhraseRecognized( PhraseRecognizedEventArgs args ){
 
-                                    System.Action keywordAction;
+                    System.Action keywordAction;
 
-                                    Debug.Log(args.text);
+                    Debug.Log(args.text);
 
-                                    if( mainControllerScript.mainMenuPosition == 1 ) phraseToBox = args.text;
+                    if( mainControllerScript.mainMenuPosition == 1 ) phraseToBox = args.text;
 
-                                    if( keywords.TryGetValue(args.text, out keywordAction) ){
-                                        keywordAction.Invoke();
-                                    }
-                                }
+                    if( keywords.TryGetValue(args.text, out keywordAction) ){
+                        keywordAction.Invoke();
+                    }
+                }
 
-                                void OnApplicationQuit()
-                                {
-                                    if (recognizer != null && recognizer.IsRunning)
-                                    {
-                                        recognizer.OnPhraseRecognized -= Recognizer_OnPhraseRecognized;
-                                        recognizer.Stop();
-                                    }
-                                }
-                            }
+                void OnApplicationQuit()
+                {
+                    if (recognizer != null && recognizer.IsRunning)
+                    {
+                        recognizer.OnPhraseRecognized -= Recognizer_OnPhraseRecognized;
+                        recognizer.Stop();
+                    }
+                }
+            }
                                         </code></pre>
                                     </div><!--//code-block-->
                                      <p>
