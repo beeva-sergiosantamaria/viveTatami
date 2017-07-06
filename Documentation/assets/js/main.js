@@ -43,5 +43,5 @@ $(document).ready(function() {
         $(this).ekkoLightbox();
     });    
 
-
+    $("video").prop("volume", 0);
 });
